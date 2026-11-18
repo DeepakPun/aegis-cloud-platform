@@ -1,0 +1,38 @@
+services:
+  mongo:
+    image: mongo:7
+    container_name: aegis-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  backend:
+    build:
+      context: ./apps/backend
+      args:
+        NODE_VERSION: 24
+    container_name: aegis-backend
+    ports:
+      - "3001:3001"
+    environment:
+      PORT: 3001
+      MONGO_URI: mongodb://mongo:27017/aegis_db
+      JWT_SECRET: local_dev_secret_change_in_prod
+    depends_on:
+      - mongo
+
+  frontend:
+    build:
+      context: ./apps/frontend
+      args:
+        NODE_VERSION: 24
+        NEXT_PUBLIC_API_URL: http://localhost:3001
+    container_name: aegis-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+volumes:
+  mongo_data:
