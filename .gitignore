@@ -1,0 +1,73 @@
+# ==========================================
+# Secrets & Environment Variables (CRITICAL)
+# ==========================================
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crt
+*.p12
+secrets.yaml
+secrets.yml
+
+# ==========================================
+# Terraform & Infrastructure as Code
+# ==========================================
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+*.tfvars
+*.tfvars.json
+!terraform.tfvars.example
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+
+# ==========================================
+# Kubernetes & Helm
+# ==========================================
+kubeconfig
+*.kubeconfig
+charts/*.tgz
+
+# ==========================================
+# Node.js / React / Next.js
+# ==========================================
+node_modules/
+.next/
+out/
+build/
+dist/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.eslintcache
+
+# ==========================================
+# Python / Flask
+# ==========================================
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+.pytest_cache/
+.coverage
+
+# ==========================================
+# OS & IDE Artifacts
+# ==========================================
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
