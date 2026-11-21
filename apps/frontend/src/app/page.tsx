@@ -81,6 +81,7 @@ export default function Home() {
       const res = await fetch(`${API_URL}/api/projects`, { headers })
       if (res.status === 401) return
       const data = await res.json()
+      console.log(data)
       if (data.projects) setProjects(data.projects)
     } catch {
       setStatusMsg("Unable to reach backend API.")
@@ -305,7 +306,7 @@ export default function Home() {
               const canDelete =
                 isMounted &&
                 user &&
-                (user._id === project.user || user.role === "admin")
+                (user._id === project.owner || user.role === "admin")
               return (
                 <div
                   key={project._id}

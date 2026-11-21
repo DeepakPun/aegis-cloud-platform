@@ -266,7 +266,7 @@ export default function HomeClient({
           <div className="grid md:grid-cols-2 gap-5">
             {projects.map((project) => {
               const canDelete =
-                user && (user.id === project.user || user.role === "admin")
+                user && (user._id === project.user || user.role === "admin")
               return (
                 <div
                   key={project._id}

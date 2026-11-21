@@ -53,14 +53,19 @@ output "rds_endpoint" {
 # Phase 2: AWS EKS Kubernetes Cluster
 # ==============================================================================
 
-# module "eks" {
-#   source = "../../modules/eks"
-#
-#   project_name       = var.project_name
-#   environment        = var.environment
-#   vpc_id             = module.vpc.vpc_id
-#   private_subnet_ids = module.vpc.private_subnet_ids
-# }
+module "eks" {
+  source = "../../modules/eks"
+
+  project_name       = var.project_name
+  environment        = var.environment
+  vpc_id             = module.vpc.vpc_id
+  private_subnet_ids = module.vpc.private_subnet_ids
+}
+
+output "eks_cluster_name" {
+  description = "EKS cluster name for aws eks update-kubeconfig"
+  value       = module.eks.cluster_name
+}
 
 # ==============================================================================
 # Helpful Outputs

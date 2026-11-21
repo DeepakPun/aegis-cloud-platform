@@ -25,7 +25,7 @@ router.post("/register", async (req, res) => {
     const user = await User.create({
       email,
       passwordHash,
-      role: role === "admin" ? "admin" : "user",
+      role: "user",
     })
 
     res.status(201).json({

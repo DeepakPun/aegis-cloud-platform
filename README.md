@@ -1,53 +1,41 @@
-# Aegis Cloud Platform — Cloud-Native Task & Credential Manager
+# Aegis Cloud Platform
 
-An end-to-end **Full-Stack, DevOps, and DevSecOps** reference architecture. This platform demonstrates how a decoupled full-stack application with JWT authentication and Role-Based Access Control (RBAC) is provisioned via Infrastructure as Code, orchestrated on Kubernetes, monitored in real time, and protected by automated security gates.
+**End-to-End Cloud-Native Full-Stack Platform on AWS EKS, Terraform, Helm & DevSecOps CI/CD**
 
-> **Live Portfolio:** [deepakpun.com](https://deepakpun.com) | **Sandbox Labs:** [://deepakpun.com](https://://deepakpun.com)
+Aegis Cloud Platform demonstrates a production-grade cloud infrastructure and DevSecOps workflow—taking a containerized Next.js and Node/Express application from local development to a high-availability AWS Kubernetes deployment backed by Infrastructure as Code, automated security gates, and observability.
 
 ---
 
-## System Architecture
-
-*(Placeholder: Add your Excalidraw / Draw.io architecture diagram to `docs/architecture-diagram.png`)*
+## Architecture Overview
 
 ```text
-[ Developer Push / PR ]
+[ Users / Browser ]
          │
          ▼
-[ GitHub Actions DevSecOps Pipeline ]
-   ├── 1. Secret Scan (Gitleaks)
-   ├── 2. SAST Code Scan (Semgrep)
-   ├── 3. IaC Policy Audit (Checkov)
-   └── 4. Container CVE Scan (Trivy) ──▶ [ AWS ECR ]
-                                              │
-                                              ▼
-[ AWS VPC (provisioned via Terraform) ] ──▶ [ AWS EKS (Kubernetes + Helm) ]
-   ├── Public Subnets: NGINX Ingress / ALB     ├── Frontend Pods (React/Next.js)
-   └── Private Subnets: EKS Nodes & AWS RDS    ├── Backend Pods (Node/Python API)
-                                               └── Prometheus + Grafana Stack
+[ AWS Elastic Load Balancer (NGINX Ingress Controller) ]
+         │
+         ├─── /      ──▶ [ Next.js Frontend Pods (EKS Private Subnets) ]
+         └─── /api/* ──▶ [ Express REST API Pods + HPA (EKS Private Subnets) ]
+                                  │
+                                  ├──▶ [ MongoDB (ClusterIP Service) ]
+                                  └──▶ [ AWS RDS PostgreSQL 16 (Private Subnets) ]
 ```
 
----
+### Core Stack
 
-## Tech Stack & Tooling
-
-* **Application:** React / Next.js (Frontend), Node.js / Express or Python / Flask (REST API), PostgreSQL
-* **Cloud & IaC:** AWS (VPC, EKS, ECR, RDS, IAM, Secrets Manager), Terraform (Modular Architecture)
-* **Containers & Orchestration:** Docker (Multi-stage non-root Alpine builds), Kubernetes, Helm, NGINX Ingress
-* **CI/CD & DevSecOps:** GitHub Actions, Gitleaks, Semgrep, Checkov, Trivy
-* **Observability:** Prometheus, Grafana
+- **Application:** Next.js / React Frontend (`:3000`), Node.js / Express REST API (`:3001`) with JWT authentication, RBAC, and `/health` readiness probes.
+- **Infrastructure as Code (Terraform):** Modular AWS provisioning (`vpc`, `ecr`, `rds`, `eks`) across two Availability Zones with a remote **Amazon S3 backend** and native `.tflock` state locking.
+- **Containerization & Orchestration:** Multi-stage, non-root Alpine Docker images hosted in private **Amazon ECR** repositories (`scan_on_push` enabled), deployed via a custom **Helm chart** with Horizontal Pod Autoscaling (HPA) and NGINX Ingress path routing.
+- **DevSecOps & CI/CD (GitHub Actions):** Automated security scanning with **Gitleaks** (secrets), **Semgrep** (SAST), **Checkov** (Terraform IaC policy checks), and **Trivy** (container vulnerability scanning), paired with automated Terraform and Helm deployment workflows.
+- **Observability:** Prometheus and Grafana configuration (`kubernetes/monitoring/prometheus-values.yaml`) for cluster and workload telemetry.
 
 ---
 
-## Progressive Engineering Milestones (Git Tags)
+## Live AWS Deployment Proof
 
-Each phase of this platform was built on an isolated feature branch, verified with automated health checks, and snapshotted using annotated Git tags for full traceability:
+![Aegis Cloud Platform Live on AWS EKS](docs/live-deployment.png)
 
-| Milestone | Git Tag | Focus Area | Key Deliverables |
-| :--- | :--- | :--- | :--- |
-| **Phase 1** | [`v1.0-aws-terraform`](../../tree/v1.0-aws-terraform) | **App & Cloud Foundation** | Full-stack CRUD app with JWT/RBAC, hardened Dockerfiles, and modular Terraform scripts for AWS VPC, ECR, and RDS. |
-| **Phase 2** | [`v2.0-k8s-helm`](../../tree/v2.0-k8s-helm) | **Kubernetes Orchestration** | Custom Helm chart (`aegis-app`), Horizontal Pod Autoscaling (HPA), NGINX Ingress routing, and AWS EKS deployment. |
-| **Phase 3** | [`v3.0-devsecops`](../../tree/v3.0-devsecops) | **Security & Observability** | Automated CI security gates (Gitleaks, Semgrep, Checkov, Trivy) blocking vulnerable builds, plus Prometheus & Grafana dashboards. |
+_Deployed on Amazon EKS (`us-east-1`) behind an AWS Classic/Network Load Balancer via NGINX Ingress, verified end-to-end across frontend UI, `/api/health` readiness probes, and database connectivity._
 
 ---
 
@@ -55,50 +43,64 @@ Each phase of this platform was built on an isolated feature branch, verified wi
 
 ```text
 aegis-cloud-platform/
-├── .github/workflows/          # CI/CD & DevSecOps automation pipelines
-├── apps/                       # Decoupled frontend and backend microservices
-├── infrastructure/terraform/   # Modular AWS IaC (VPC, ECR, RDS, EKS)
-├── kubernetes/                 # Custom Helm charts and Prometheus/Grafana configs
-├── docs/                       # Architecture diagrams and walkthrough notes
+├── .github/workflows/          # DevSecOps CI, EKS CD, and Terraform automation pipelines
+├── apps/
+│   ├── frontend/               # Next.js UI + multi-stage Alpine Dockerfile
+│   └── backend/                # Express API + multi-stage Alpine Dockerfile
+├── infrastructure/terraform/
+│   ├── envs/prod/              # Root production orchestration, variables & S3 backend
+│   └── modules/                # Reusable VPC, ECR, RDS, and EKS modules
+├── kubernetes/
+│   ├── helm/aegis-app/         # Custom Helm chart (Deployments, Services, Ingress, HPA)
+│   └── monitoring/             # Prometheus & Grafana Helm values
+├── docs/                       # Architecture diagrams, progress logs & live screenshots
 └── docker-compose.yml          # Local full-stack development environment
 ```
 
 ---
 
-## Local Development Quickstart
+## Engineering Milestones (Git Tags)
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com
-   cd aegis-cloud-platform
-   ```
+Each phase of the platform was developed on an isolated feature branch, merged via Pull Request, and tagged for traceability:
 
-2. **Spin up the local stack (Frontend + Backend + PostgreSQL):**
-   ```bash
-   docker compose up --build
-   ```
-
-3. **Verify API health:**
-   ```bash
-   curl http://localhost:5000/health
-   ```
+| Tag                             | Milestone                             | Key Deliverables                                                                                               |
+| :------------------------------ | :------------------------------------ | :------------------------------------------------------------------------------------------------------------- |
+| **`4.01.app_core`**             | Application Core & Containerization   | Next.js frontend, Express API (JWT + RBAC), multi-stage non-root Dockerfiles, local Compose                    |
+| **`4.02.aws_infra`**            | Phase 1: AWS Core Infrastructure      | Remote S3 state backend with locking, multi-AZ VPC (public/private subnets + NAT), ECR, private RDS PostgreSQL |
+| **`4.03.eks_helm`**             | Phase 2: Kubernetes & Helm Deployment | AWS EKS control plane & managed node group, NGINX Ingress Controller, custom Helm chart with HPA               |
+| **`4.04.devsecops_monitoring`** | Phase 3: DevSecOps & Observability    | GitHub Actions pipelines (Gitleaks, Semgrep, Checkov, Trivy) & Prometheus/Grafana values                       |
 
 ---
 
-## Cloud Provisioning (Terraform)
+## Quick Start
 
-To deploy the AWS infrastructure from scratch:
+### 1. Local Development
+
+```bash
+docker compose up --build
+```
+
+### 2. Provision AWS Infrastructure (Terraform)
 
 ```bash
 cd infrastructure/terraform/envs/prod
-cp terraform.tfvars.example terraform.tfvars
 terraform init
 terraform plan
 terraform apply
 ```
 
-To tear down all cloud resources and avoid ongoing AWS charges:
+### 3. Deploy Application to EKS (Helm)
 
 ```bash
-terraform destroy
+aws eks update-kubeconfig --region us-east-1 --name aegis-prod-eks
+helm upgrade --install aegis-app ./kubernetes/helm/aegis-app \
+  --set-string awsAccountId="<AWS_ACCOUNT_ID>"
+```
+
+### 4. Clean Teardown
+
+```bash
+helm uninstall aegis-app
+helm uninstall ingress-nginx -n ingress-nginx
+cd infrastructure/terraform/envs/prod && terraform destroy
 ```

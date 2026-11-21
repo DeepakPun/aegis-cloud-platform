@@ -10,6 +10,7 @@
 *.p12
 secrets.yaml
 secrets.yml
+*.sh
 
 # ==========================================
 # Terraform & Infrastructure as Code
@@ -71,3 +72,5 @@ Thumbs.db
 .idea/
 *.swp
 *.swo
+
+blog-note.md

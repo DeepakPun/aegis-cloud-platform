@@ -9,6 +9,6 @@ export interface Project {
   title: string
   description: string
   techStack: string[]
-  user: string
+  owner: string
   createdAt: string
 }

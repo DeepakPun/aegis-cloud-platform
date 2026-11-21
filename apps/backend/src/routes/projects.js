@@ -69,7 +69,7 @@ router.delete("/:id", authenticate, async (req, res) => {
       return res.status(404).json({ error: "Project not found." })
     }
     if (
-      project.owner.toString() !== req.user._id &&
+      project.owner.toString() !== req.user._id.toString() &&
       req.user.role !== "admin"
     ) {
       return res

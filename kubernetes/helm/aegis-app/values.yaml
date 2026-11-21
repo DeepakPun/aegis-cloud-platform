@@ -1,0 +1,35 @@
+awsAccountId: "000000000000"
+awsRegion: "us-east-1"
+
+frontend:
+  name: aegis-frontend
+  replicas: 2
+  image:
+    repository: aegis-prod-frontend
+    tag: latest
+    pullPolicy: Always
+  port: 3000
+
+backend:
+  name: aegis-backend
+  replicas: 2
+  image:
+    repository: aegis-prod-backend
+    tag: latest
+    pullPolicy: Always
+  port: 3001
+  env:
+    PORT: "3001"
+    MONGO_URI: "mongodb://aegis-mongo:27017/aegis_db"
+    JWT_SECRET: "aegis-prod-super-secret-jwt-key-2026"
+
+mongodb:
+  enabled: true
+  name: aegis-mongo
+  image: "mongo:7.0"
+  port: 27017
+
+hpa:
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 75
